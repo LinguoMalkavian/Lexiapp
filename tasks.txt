@@ -1,0 +1,19 @@
+Max
+Code the Labirynth game
+Code the Main screen 
+Define color Palette and general looks
+
+
+Pablo
+Code the word build game (requires asr)
+Design the list of words to be used in the mockup
+Record the words to be used in the mockup
+
+Both (Unassigned)
+Figure out library of learning mockup
+Interface with rebecca for illustrations
+
+Illustrations from Rebecca
+Views of Lexi??
+Books and bookshelf
+Buttons? 
