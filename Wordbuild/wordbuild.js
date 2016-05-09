@@ -2,15 +2,24 @@
 var bgroundCol="#c9481d";
 var bgroundRivet="#e6e64d";
 //TODO determine colors
-var buttonUnpressedCol="green"
-var buttonPressedCol="green"
+var buttonUnpressedCol="#32cf32"
+var buttonPressedCol="#327332"
 var fontColor="#3366ff"
+
+
+//Coordinates of stuff
+var buttonCenterX=520;
+var buttonCenterY=325;
+var buttonRadius=40;
 
 //Determine game variables
 var word = getWord();
 var time = 300;
 var animationtype= 'streaks'
 var wordspeed=2;
+
+//Other useful global variables
+buttonPressed=false 
 
 //Load files
 var microImage=new Image();
@@ -23,8 +32,7 @@ microImage.src='micro.png';
 //Set background
 var canvas = document.getElementById("myCanvas");
 var ctx=canvas.getContext("2d");
-drawBackground()
-
+ 
 //Set buffer
 var buffer= document.createElement('canvas');
 buffer.width=500;
@@ -79,8 +87,10 @@ drawElements();
 
 //Refresher
 function refresh(){
+	ctx.clearRect(0,0,canvas.width,canvas.height)
 	updatePositions();
 	drawBackground();
+	drawButton()
 	drawElements();
 
 }
@@ -120,13 +130,10 @@ function updatePositions(){
 
 
 //Draws the button TODO
-function drawButton(pressed){
-	buttonCenterX=520;
-	buttonCenterY=325;
-	buttonRadius=40;
-	//Draw thr center
+function drawButton(){
+	//Draw the center
 	ctx.beginPath();
-	if (pressed){
+	if (buttonPressed){
 		ctx.fillStyle=buttonPressedCol;
 	}else{
 		ctx.fillStyle=buttonUnpressedCol;
@@ -139,14 +146,14 @@ function drawButton(pressed){
 	ctx.beginPath();
 	ctx.arc(buttonCenterX,buttonCenterY,buttonRadius+2 ,0,Math.PI*2);
 	ctx.lineWidth=8
-	ctx.strokeStyle="green";
+	ctx.strokeStyle=buttonUnpressedCol;
 	ctx.stroke()
 	ctx.closePath();
 
 	//Draw limit of the inner button
 	ctx.beginPath();
 	ctx.lineWidth=1
-	ctx.arc(buttonCenterX,buttonCenterY,buttonRadius+1 ,0,Math.PI*2);
+	ctx.arc(buttonCenterX,buttonCenterY,buttonRadius ,0,Math.PI*2);
 	ctx.strokeStyle="black";
 	ctx.stroke();
 	ctx.closePath();
@@ -168,7 +175,6 @@ function drawBackground(){
 	ctx.strokeStyle=bgroundRivet;
 	ctx.stroke();
 	ctx.closePath();
-	drawButton("False");
 
 }
 
@@ -179,14 +185,29 @@ function getWord(){
 	//TODO this function is supposed to load the words file and get a random one
 	return "fingiré"
 }
-// document.addEventListener("mousedown", mouseDownHandler, false);
-// document.addEventListener("mouseup", mouseUpHandler, false);
 
-// function mouseDownHan(e) {
-//     var relativeX = e.clientX - canvas.offsetLeft;
-//     if(relativeX > 0 + paddleWidth/2 && relativeX < canvas.width -paddleWidth/2) {
-//         paddleX = relativeX - paddleWidth/2;
-// }
-// }
+//I'm a mathematician so we now have a cartesian distance function, so what?
+function distance(X1,Y1,X2,Y2){
+	dist=Math.sqrt(Math.pow(X1-X2,2)+Math.pow(Y1-Y2,2));
+	return dist;
+}
+
+document.addEventListener("mousedown", mouseDownHandler, false);
+document.addEventListener("mouseup", mouseUpHandler, false);
+
+function mouseDownHandler(e) {
+	var relativeX = e.clientX - canvas.offsetLeft;
+    var relativeY = e.clientY-canvas.offsetTop;
+    if (distance(relativeX,relativeY,buttonCenterX,buttonCenterY)<=(buttonRadius+5)){
+    	buttonPressed=true
+    	
+    }
+
+}
+function mouseUpHandler(e) {
+	var relativeX = e.clientX - canvas.offsetLeft;
+    var relativeY = e.clientY - canvas.offsetUp;
+    buttonPressed=false
+}
 // main call that keeps the game refreshing
 setInterval(refresh,10)
