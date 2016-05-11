@@ -29,21 +29,21 @@ var buttonPressed=false ;
 
 //Initialize and set the Speech recognizer
 //imports
-// var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-// var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-// var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
-// //instancing and settings
+//instancing and settings
 
-// var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
-// var recognition = new SpeechRecognition();
-// var speechRecognitionList = new SpeechGrammarList();
-// speechRecognitionList.addFromString(grammar, 1);
-// recognition.grammars = speechRecognitionList;
-// //recognition.continuous = false;
-// recognition.lang = 'es-CO';
-// recognition.interimResults = false;
-// recognition.maxAlternatives = 5;
+var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
+var recognition = new SpeechRecognition();
+var speechRecognitionList = new SpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
+recognition.grammars = speechRecognitionList;
+//recognition.continuous = false;
+recognition.lang = 'es-CO';
+recognition.interimResults = false;
+recognition.maxAlternatives = 5;
 
 //Load files
 var microImage=new Image();
@@ -110,10 +110,10 @@ if (animationtype=="streaks"){
 	//Initialize slices
 	var numcolumns=3;
 	var numrows=2;
-	var sliceHeight=buffer.height/numrows;
-	var sliceWidth=buffer.width/numcolumns;
+	var sliceHeight=(buffer.height/numrows);
+	var sliceWidth=(buffer.width/numcolumns);
 	slices=[]
-	for(var r =1; r<= numrows;i++){
+	for(var r =1; r<= numrows;r++){
 		row=[]
 		y=buffer.height-sliceHeight*r;
 		for(var c=0; c<numcolumns; c++){
@@ -157,7 +157,7 @@ function drawElements(){
 				elem.draw()
 		});
 	}else{
-		for(var r =0; r< numrows;i++){
+		for(var r =0; r< numrows;r++){
 			for(var c=0; c<numcolumns; c++)	{
 				theSlice=slices[r][c]
 				theSlice.draw();
@@ -185,7 +185,7 @@ function updatePositions(){
 	}else{
 		var mvtCol=Math.floor(Math.random()*numcolumns);
 		var accell=false; 
-		for(var r =0; r< numrows;i++){
+		for(var r =0; r< numrows;r++){
 			for(var c=0; c<numcolumns; c++)	{
 				theSlice=slices[r][c]
 				if(theSlice.posY>=final_wordY-theSlice.y){
