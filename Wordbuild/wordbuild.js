@@ -1,10 +1,16 @@
 //Color scheme
-var bgroundCol="#c9481d";
-var bgroundRivet="#e6e64d";
+//LexiGray: rgb(119,104,102)
+//LexiPink: rgb(209,143,133)
+//LexiDarkGrey: rgb(76,61,63)
+var bgroundCol="rgb(22,107,84)"//"#339966";
+var bgroundRivet="#ffb500"; //e6e64d
 //TODO determine colors
-var buttonUnpressedCol="#32cf32"
-var buttonPressedCol="#327332"
-var fontColor="#3366ff"
+var buttonUnpressedCol="#00ff80"
+var buttonPressedCol="#339966"
+var buttonOutlineCol= "#e6e64d"
+var fontColor="#ffb500"
+var microWidth = 30;
+var microHeight = 50;
 
 
 //Coordinates of stuff
@@ -15,19 +21,36 @@ var buttonRadius=40;
 //Determine game variables
 var word = getWord();
 var time = 300;
-var animationtype= 'streaks'
+var animationtype= 'streaks';
 var wordspeed=2;
 
 //Other useful global variables
-buttonPressed=false 
+var buttonPressed=false ;
+
+//Initialize and set the Speech recognizer
+//imports
+var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+
+//instancing and settings
+
+var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
+var recognition = new SpeechRecognition();
+var speechRecognitionList = new SpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
+recognition.grammars = speechRecognitionList;
+//recognition.continuous = false;
+recognition.lang = 'es';
+recognition.interimResults = false;
+recognition.maxAlternatives = 5;
 
 //Load files
 var microImage=new Image();
-microImage.onload = function () {
-    ctx.drawImage(img, 300, 300);// this is line 14
-    alert("It's there look at the Motherfucker")
-};
-microImage.src='micro.png';
+// microImage.onload = function () {
+//     ctx.drawImage(microImage, 300, 300);// this is line 14
+// };
+microImage.src='mic.png';
 
 //Set background
 var canvas = document.getElementById("myCanvas");
@@ -154,12 +177,12 @@ function drawButton(){
 	ctx.beginPath();
 	ctx.lineWidth=1
 	ctx.arc(buttonCenterX,buttonCenterY,buttonRadius ,0,Math.PI*2);
-	ctx.strokeStyle="black";
+	ctx.strokeStyle=buttonOutlineCol;
 	ctx.stroke();
 	ctx.closePath();
 	//Draw the Icon
 	
-	//ctx.drawImage(microImage,buttonCenterX,buttonCenterY);
+	ctx.drawImage(microImage,buttonCenterX-(microWidth/2),buttonCenterY-(microHeight/2),microWidth,microHeight);
 	//TODO
 
 }
@@ -175,7 +198,7 @@ function drawBackground(){
 	ctx.strokeStyle=bgroundRivet;
 	ctx.stroke();
 	ctx.closePath();
-
+	
 }
 
 //Utilities
@@ -183,7 +206,7 @@ function drawBackground(){
 //TODO loads the available words and randomly selects one
 function getWord(){
 	//TODO this function is supposed to load the words file and get a random one
-	return "fingiré"
+	return "carro"
 }
 
 //I'm a mathematician so we now have a cartesian distance function, so what?
@@ -200,14 +223,47 @@ function mouseDownHandler(e) {
     var relativeY = e.clientY-canvas.offsetTop;
     if (distance(relativeX,relativeY,buttonCenterX,buttonCenterY)<=(buttonRadius+5)){
     	buttonPressed=true
-    	
+    	recognition.start();
+  		console.log('Ready to receive a word.');
     }
 
 }
 function mouseUpHandler(e) {
 	var relativeX = e.clientX - canvas.offsetLeft;
     var relativeY = e.clientY - canvas.offsetUp;
+    recognition.stop()
     buttonPressed=false
 }
+
+recognition.onresult = function(event) {
+  // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
+  // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
+  // It has a getter so it can be accessed like an array
+  // The first [0] returns the SpeechRecognitionResult at position 0.
+  // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
+  // These also have getters so they can be accessed like arrays.
+  // The second [0] returns the SpeechRecognitionAlternative at position 0.
+  // We then return the transcript property of the SpeechRecognitionAlternative object 
+  console.log("It did stop")
+  var answer = event.results[0][0].transcript;
+  diagnostic.textContent = 'Result received: ' + answer + '.';
+  console.log('Confidence: ' + event.results[0][0].confidence);
+  if(result==word){
+  	//To do, implement victory message
+  		alert("Yes that's it champion");
+  	}else{
+  		alert("Sorry, that's not the word, are you dyslexic or something?")
+  	}
+  }
+
+recognition.onnomatch = function(event) {
+  console.log("Nope, not in grammar");
+}
+
+recognition.onerror = function(event) {
+  console.log( 'Error occurred in recognition: ' + event.error);
+}
+
+
 // main call that keeps the game refreshing
 setInterval(refresh,10)
