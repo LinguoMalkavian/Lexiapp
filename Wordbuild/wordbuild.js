@@ -21,7 +21,7 @@ var buttonRadius=40;
 //Determine game variables
 var word = getWord();
 var time = 300;
-var animationtype= 'streaks';
+var animationtype= 'blocks';
 var wordspeed=2;
 
 //Other useful global variables
@@ -29,21 +29,21 @@ var buttonPressed=false ;
 
 //Initialize and set the Speech recognizer
 //imports
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+// var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+// var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+// var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
-//instancing and settings
+// //instancing and settings
 
-var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
-var recognition = new SpeechRecognition();
-var speechRecognitionList = new SpeechGrammarList();
-speechRecognitionList.addFromString(grammar, 1);
-recognition.grammars = speechRecognitionList;
-//recognition.continuous = false;
-recognition.lang = 'es-CO';
-recognition.interimResults = false;
-recognition.maxAlternatives = 5;
+// var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
+// var recognition = new SpeechRecognition();
+// var speechRecognitionList = new SpeechGrammarList();
+// speechRecognitionList.addFromString(grammar, 1);
+// recognition.grammars = speechRecognitionList;
+// //recognition.continuous = false;
+// recognition.lang = 'es-CO';
+// recognition.interimResults = false;
+// recognition.maxAlternatives = 5;
 
 //Load files
 var microImage=new Image();
@@ -73,7 +73,7 @@ var wordsize = offctx.measureText(word);
 
 
 var final_wordleftX = (canvas.width - wordsize.width)/2
-
+var final_wordY=130;
 
 //Declare the slice class
 function Slice(x,y,height,width){
@@ -97,7 +97,7 @@ if (animationtype=="streaks"){
 		x=0
 		y=sliceheight*i;	
 		theSlice=new Slice(x,y,sliceheight,slicewidth);
-		theSlice.posY=y+130
+		theSlice.posY=y+final_wordY
 		if(i%2==0){
 			theSlice.posX=0-wordsize.width +50;
 		}else{
@@ -110,17 +110,17 @@ if (animationtype=="streaks"){
 	//Initialize slices
 	var numcolumns=3;
 	var numrows=2;
-	sliceHeight=buffer.height/numrows;
-	sliceWidth=buffer.width/numcolumns;
+	var sliceHeight=buffer.height/numrows;
+	var sliceWidth=buffer.width/numcolumns;
 	slices=[]
 	for(var r =1; r<= numrows;i++){
 		row=[]
-		y=buffer.height-sliceHeight*c;
-		for(var c=0; c<numcolumns; c++)	{
+		y=buffer.height-sliceHeight*r;
+		for(var c=0; c<numcolumns; c++){
 			x=c*sliceWidth;
-			theSlice=new Slice(x,y,sliceheight,slicewidth);
-			theSlice.posY=0-sliceHight;
-			theSlice.posX=x
+			theSlice=new Slice(x,y,sliceHeight,sliceWidth);
+			theSlice.posY=0-sliceHeight;
+			theSlice.posX=x+final_wordleftX
 			theSlice.dy=0
 			row.push(theSlice);
 		}
@@ -151,25 +151,55 @@ function drawFullText(){
 }
 //Draws the following frame of the animation (the states are updated by an independant function)
 function drawElements(){
-	slices.forEach(
-		function(elem){
-			elem.draw()
-	});
+	if(animationtype=="streaks"){
+		slices.forEach(
+			function(elem){
+				elem.draw()
+		});
+	}else{
+		for(var r =0; r< numrows;i++){
+			for(var c=0; c<numcolumns; c++)	{
+				theSlice=slices[r][c]
+				theSlice.draw();
+				}
+			}
+		}
 }
 function updatePositions(){
-	for(var i =0; i< 4;i++){
-		if(i%2==0){
-			if(slices[i].posX <final_wordleftX){
-				slices[i].posX+=wordspeed;
+	if(animationtype=="streaks"){
+		for(var i =0; i< 4;i++){
+			if(i%2==0){
+				if(slices[i].posX <final_wordleftX){
+					slices[i].posX+=wordspeed;
+				}else{
+					slices[i].posX=final_wordleftX
+				}
 			}else{
-				slices[i].posX=final_wordleftX
+				if(slices[i].posX >final_wordleftX){
+					slices[i].posX-=wordspeed;
+				}else{
+					slices[i].posX=final_wordleftX
+				}
 			}
-		}else{
-			if(slices[i].posX >final_wordleftX){
-				slices[i].posX-=wordspeed;
-			}else{
-				slices[i].posX=final_wordleftX
+		}
+	}else{
+		var mvtCol=Math.floor(Math.random()*numcolumns);
+		var accell=false; 
+		for(var r =0; r< numrows;i++){
+			for(var c=0; c<numcolumns; c++)	{
+				theSlice=slices[r][c]
+				if(theSlice.posY>=final_wordY-theSlice.y){
+					theSlice.posY=final_wordY+theSlice.y
+					theSlice.dy=-1
+				}else{
+					if (!accell && c==mvtCol && theSlice.dy==0){
+						theSlice.dy=2
+						accell=true;
+					}
+					theSlice.posY+=theSlice.dy
+				}
 			}
+			
 		}
 	}
 }
