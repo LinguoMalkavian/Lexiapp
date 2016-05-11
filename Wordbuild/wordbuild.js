@@ -41,7 +41,7 @@ var speechRecognitionList = new SpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
 recognition.grammars = speechRecognitionList;
 //recognition.continuous = false;
-recognition.lang = 'es';
+recognition.lang = 'es-CO';
 recognition.interimResults = false;
 recognition.maxAlternatives = 5;
 
@@ -88,24 +88,47 @@ Slice.prototype.draw = function(){
 }
 
 //Initialize slices
-sliceheight=buffer.height/4
-slicewidth=buffer.width
-slices=[]
-for(var i =0; i< 4;i++){
-	x=0
-	y=sliceheight*i;	
-	theSlice=new Slice(x,y,sliceheight,slicewidth);
-	theSlice.posY=y+130
-	if(i%2==0){
-		theSlice.posX=0-wordsize.width +50;
-	}else{
-		theSlice.posX=canvas.width;
-	}
-	slices.push(theSlice);
+if (animationtype=="streaks"){
+	//Initialize slices
+	sliceheight=buffer.height/4
+	slicewidth=buffer.width
+	slices=[]
+	for(var i =0; i< 4;i++){
+		x=0
+		y=sliceheight*i;	
+		theSlice=new Slice(x,y,sliceheight,slicewidth);
+		theSlice.posY=y+130
+		if(i%2==0){
+			theSlice.posX=0-wordsize.width +50;
+		}else{
+			theSlice.posX=canvas.width;
+		}
+		slices.push(theSlice);
 
+	}
+}else{
+	//Initialize slices
+	var numcolumns=3;
+	var numrows=2;
+	sliceHeight=buffer.height/numrows;
+	sliceWidth=buffer.width/numcolumns;
+	slices=[]
+	for(var r =1; r<= numrows;i++){
+		row=[]
+		y=buffer.height-sliceHeight*c;
+		for(var c=0; c<numcolumns; c++)	{
+			x=c*sliceWidth;
+			theSlice=new Slice(x,y,sliceheight,slicewidth);
+			theSlice.posY=0-sliceHight;
+			theSlice.posX=x
+			theSlice.dy=0
+			row.push(theSlice);
+		}
+		slices.push(row);
+
+	}
 }
 
-drawElements();
 
 
 //Refresher
