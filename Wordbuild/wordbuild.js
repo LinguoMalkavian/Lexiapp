@@ -206,7 +206,10 @@ function drawBackground(){
 //TODO loads the available words and randomly selects one
 function getWord(){
 	//TODO this function is supposed to load the words file and get a random one
-	return "carro"
+	wordlist=['la ','va ','ve ','mi ','hoy ','doy ','soy ','pie ','rey ','bus ','sal ','luz ','sed ','miel ','piel ','fiel ','pies ','tren ','flor ','cruz ','niño ','mesa ','carro ','malo ','todo ','lápiz ','pared ','metál ','árbol ','antes '];
+	opt=wordlist.length;
+	choice=Math.floor(Math.random()*opt);
+	return wordlist[choice];
 }
 
 //I'm a mathematician so we now have a cartesian distance function, so what?
