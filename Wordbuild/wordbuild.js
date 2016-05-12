@@ -21,7 +21,7 @@ var buttonRadius=40;
 //Determine game variables
 var word = getWord();
 var time = 300;
-var animationtype= 'blocks';
+var animationtype=setAnimationType();
 var wordspeed=2;
 
 //Other useful global variables
@@ -29,21 +29,21 @@ var buttonPressed=false ;
 
 //Initialize and set the Speech recognizer
 //imports
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+// var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+// var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+// var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
-//instancing and settings
+// //instancing and settings
 
-var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
-var recognition = new SpeechRecognition();
-var speechRecognitionList = new SpeechGrammarList();
-speechRecognitionList.addFromString(grammar, 1);
-recognition.grammars = speechRecognitionList;
-//recognition.continuous = false;
-recognition.lang = 'es-CO';
-recognition.interimResults = false;
-recognition.maxAlternatives = 5;
+// var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
+// var recognition = new SpeechRecognition();
+// var speechRecognitionList = new SpeechGrammarList();
+// speechRecognitionList.addFromString(grammar, 1);
+// recognition.grammars = speechRecognitionList;
+// //recognition.continuous = false;
+// recognition.lang = 'es-CO';
+// recognition.interimResults = false;
+// recognition.maxAlternatives = 5;
 
 //Load files
 var microImage=new Image();
@@ -93,23 +93,30 @@ if (animationtype=="streaks"){
 	sliceheight=buffer.height/4
 	slicewidth=buffer.width
 	slices=[]
-	for(var i =0; i< 4;i++){
-		x=0
-		y=sliceheight*i;	
-		theSlice=new Slice(x,y,sliceheight,slicewidth);
+	var accum=0
+	for(var i=0; i< 4;i++){
+		x=0;
+		if(i==0 || i==3){
+			var thisSliceheight=sliceheight*1.50;	
+		}else{
+			var thisSliceheight=sliceheight*0.50;
+		}
+		y=accum;	
+		theSlice=new Slice(x,y,thisSliceheight,slicewidth);
 		theSlice.posY=y+final_wordY
 		if(i%2==0){
 			theSlice.posX=0-wordsize.width +50;
 		}else{
 			theSlice.posX=canvas.width;
 		}
+		accum+=thisSliceheight;
 		slices.push(theSlice);
 
 	}
 }else{
 	//Initialize slices
-	var numcolumns=3;
-	var numrows=2;
+	var numcolumns=15;
+	var numrows=5;
 	var sliceHeight=(buffer.height/numrows);
 	var sliceWidth=(buffer.width/numcolumns);
 	slices=[]
@@ -119,7 +126,7 @@ if (animationtype=="streaks"){
 		for(var c=0; c<numcolumns; c++){
 			x=c*sliceWidth;
 			theSlice=new Slice(x,y,sliceHeight,sliceWidth);
-			theSlice.posY=0-sliceHeight;
+			theSlice.posY=0-sliceHeight*r;
 			theSlice.posX=x+final_wordleftX
 			theSlice.dy=0
 			row.push(theSlice);
@@ -136,8 +143,9 @@ function refresh(){
 	ctx.clearRect(0,0,canvas.width,canvas.height)
 	updatePositions();
 	drawBackground();
-	drawButton()
+	drawButton();
 	drawElements();
+	//drawFullText();
 
 }
 
@@ -146,7 +154,7 @@ function refresh(){
 //Draws the ful text to it's final position in the screen
 //used for debugging and experimenting
 function drawFullText(){
-	ctx.drawImage(buffer, final_wordleftX  , 100);
+	ctx.drawImage(buffer, final_wordleftX  , final_wordY);
 	
 }
 //Draws the following frame of the animation (the states are updated by an independant function)
@@ -187,14 +195,17 @@ function updatePositions(){
 		var accell=false; 
 		for(var r =0; r< numrows;r++){
 			for(var c=0; c<numcolumns; c++)	{
+				
 				theSlice=slices[r][c]
-				if(theSlice.posY>=final_wordY-theSlice.y){
+				if(theSlice.posY>=final_wordY+theSlice.y){
 					theSlice.posY=final_wordY+theSlice.y
 					theSlice.dy=-1
 				}else{
-					if (!accell && c==mvtCol && theSlice.dy==0){
-						theSlice.dy=2
+					if(!accell && c==mvtCol && theSlice.dy==0){
+						theSlice.dy=1
 						accell=true;
+					}else if(theSlice.dy!=0){
+						theSlice.dy+=0.1
 					}
 					theSlice.posY+=theSlice.dy
 				}
@@ -262,6 +273,16 @@ function getWord(){
 	return "carro"
 }
 
+function setAnimationType(){
+	var die=Math.floor(Math.random()*10)
+	if (die%2==0){
+		animationtype="streaks";
+	}else{
+		animationtype="blocks";
+	}
+	return animationtype;
+	
+}
 //I'm a mathematician so we now have a cartesian distance function, so what?
 function distance(X1,Y1,X2,Y2){
 	dist=Math.sqrt(Math.pow(X1-X2,2)+Math.pow(Y1-Y2,2));
@@ -276,7 +297,7 @@ function mouseDownHandler(e) {
     var relativeY = e.clientY-canvas.offsetTop;
     if (distance(relativeX,relativeY,buttonCenterX,buttonCenterY)<=(buttonRadius+5)){
     	buttonPressed=true
-    	recognition.start();
+    	// recognition.start();
   		console.log('Ready to receive a word.');
     }
 
@@ -284,38 +305,38 @@ function mouseDownHandler(e) {
 function mouseUpHandler(e) {
 	var relativeX = e.clientX - canvas.offsetLeft;
     var relativeY = e.clientY - canvas.offsetUp;
-    recognition.stop()
+    // recognition.stop()
     buttonPressed=false
 }
 
-recognition.onresult = function(event) {
-  // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
-  // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
-  // It has a getter so it can be accessed like an array
-  // The first [0] returns the SpeechRecognitionResult at position 0.
-  // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
-  // These also have getters so they can be accessed like arrays.
-  // The second [0] returns the SpeechRecognitionAlternative at position 0.
-  // We then return the transcript property of the SpeechRecognitionAlternative object 
-  console.log("It did stop")
-  var answer = event.results[0][0].transcript;
-  diagnostic.textContent = 'Result received: ' + answer + '.';
-  console.log('Confidence: ' + event.results[0][0].confidence);
-  if(result==word){
-  	//To do, implement victory message
-  		alert("Yes that's it champion");
-  	}else{
-  		alert("Sorry, that's not the word, are you dyslexic or something?")
-  	}
-  }
+// recognition.onresult = function(event) {
+//   // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
+//   // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
+//   // It has a getter so it can be accessed like an array
+//   // The first [0] returns the SpeechRecognitionResult at position 0.
+//   // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
+//   // These also have getters so they can be accessed like arrays.
+//   // The second [0] returns the SpeechRecognitionAlternative at position 0.
+//   // We then return the transcript property of the SpeechRecognitionAlternative object 
+//   console.log("It did stop")
+//   var answer = event.results[0][0].transcript;
+//   diagnostic.textContent = 'Result received: ' + answer + '.';
+//   console.log('Confidence: ' + event.results[0][0].confidence);
+//   if(result==word){
+//   	//To do, implement victory message
+//   		alert("Yes that's it champion");
+//   	}else{
+//   		alert("Sorry, that's not the word, are you dyslexic or something?")
+//   	}
+//   }
 
-recognition.onnomatch = function(event) {
-  console.log("Nope, not in grammar");
-}
+// recognition.onnomatch = function(event) {
+//   console.log("Nope, not in grammar");
+// }
 
-recognition.onerror = function(event) {
-  console.log( 'Error occurred in recognition: ' + event.error);
-}
+// recognition.onerror = function(event) {
+//   console.log( 'Error occurred in recognition: ' + event.error);
+// }
 
 
 // main call that keeps the game refreshing
