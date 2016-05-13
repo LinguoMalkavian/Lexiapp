@@ -40,11 +40,12 @@ var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEv
 
 var grammar = "#JSGF V1.0; grammar simple; public <word> =la | va | ve | mi | hoy | doy | soy | pie | rey | bus | sal | luz | sed | miel | piel | fiel | pies | tren | flor | cruz | niño | mesa | carro | malo | todo | lápiz | pared | metál | árbol | antes"
 var recognition = new SpeechRecognition();
+recognition.lang = 'es-CO';
 var speechRecognitionList = new SpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
 recognition.grammars = speechRecognitionList;
 //recognition.continuous = false;
-recognition.lang = 'es-CO';
+
 recognition.interimResults = false;
 recognition.maxAlternatives = 5;
 
@@ -158,8 +159,8 @@ function refresh(){
 		if (timer==fulltime){
 			alert("Lo siento, se acabó el tiempo")
 			running=false
-			defeat();
-		}
+			document.location.reload();
+			}
 	}
 
 	//drawFullText();
@@ -347,7 +348,6 @@ function mouseDownHandler(e) {
     var relativeY = e.clientY-canvas.offsetTop;
     if (distance(relativeX,relativeY,buttonCenterX,buttonCenterY)<=(buttonRadius+5)){
     	buttonPressed=true
-    	running=false;
     	recognition.start();
   		console.log('Ready to receive a word.');
     }
@@ -358,7 +358,7 @@ function mouseUpHandler(e) {
     var relativeY = e.clientY - canvas.offsetUp;
     recognition.stop()
     buttonPressed=false
-    running=true;
+    
 }
 
 recognition.onresult = function(event) {
@@ -385,9 +385,8 @@ recognition.onresult = function(event) {
 
   	}else{
   		alert("Lo siento esa no es la palabra correcta")
-  		running=true
-  		tim
-  		document.location.reload();
+  		//running=true
+  		timer+=50
   	}
   }
 
