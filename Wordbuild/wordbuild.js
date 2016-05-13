@@ -29,6 +29,7 @@ var running=true;
 
 //Other useful global variables
 var buttonPressed=false ;
+var victory=false;
 
 //Initialize and set the Speech recognizer
 //imports
@@ -50,18 +51,28 @@ recognition.interimResults = false;
 recognition.maxAlternatives = 5;
 
 //Load files
+//Images
 var microImage=new Image();
-// microImage.onload = function () {
-//     ctx.drawImage(microImage, 300, 300);// this is line 14
-// };
 microImage.src='mic.png';
-
 var chronoImage=new Image();
 chronoImage.src='chrono.png';
+var lexiLeft=new Image();
+lexiLeft.src='lexiLeft.png'
+var lexiRight=new Image();
+lexiRight.src='lexiRight.png'
+var lexiWait= new Image();
+lexiWait.src= 'LexiWait.png'
+
+//Lexidance
+var finalAnim=false;
+var dancingrate=40;
+var frameCount=1;
+var lexiSide=1
 
 //Set background
 var canvas = document.getElementById("myCanvas");
 var ctx=canvas.getContext("2d");
+
  
 //Set buffer
 var buffer= document.createElement('canvas');
@@ -157,10 +168,12 @@ function refresh(){
 	if(running){
 		timer++;
 		if (timer==fulltime){
-			alert("Lo siento, se acabó el tiempo")
-			running=false
-			document.location.reload();
+			defeat();
 			}
+	}else if (victory){
+		victoryAnimation();
+	}else{
+		defeatAnimation();
 	}
 
 	//drawFullText();
@@ -308,7 +321,42 @@ function drawChrono(){
 
 //Draws the defeat sequence and then restarts
 function defeat(){
-	alert("Lo siento se acabó el tiempo")
+	running=false
+}
+
+function victory(){
+	running=false;
+	victory=true;
+
+}
+
+function victoryAnimation(){
+	lexiWidth=lexiLeft.width/10
+	lexiHeight=lexiLeft.height/10
+	lexiPosX=(canvas.width/2)-(lexiWidth/2)
+	lexiPosY=(canvas.height/2)-(lexiHeight/2)
+
+	if (frameCount%dancingrate==0){
+		lexiSide=-lexiSide;
+	}
+	if (lexiSide==1){
+		ctx.drawImage(lexiLeft,lexiPosX,lexiPosY,lexiWidth,lexiHeight);
+		frameCount++;
+	}else{
+		ctx.drawImage(lexiRight,lexiPosX,lexiPosY,lexiWidth,lexiHeight);
+		frameCount++
+	}
+}
+
+function defeatAnimation(){
+	lexiWaitWidth=lexiWait.width/10
+	lexiWaitHeight=lexiWait.height/10
+	lexiWaitPosX=(canvas.width/2)-(lexiWaitWidth/2)
+	lexiWaitPosY=(canvas.height/2)-(lexiWaitHeight/2)
+
+	ctx.drawImage(lexiWait,lexiWaitPosX,lexiWaitPosY,lexiWaitWidth,lexiWaitHeight);
+	
+
 }
 
 //Utilities
@@ -339,9 +387,16 @@ function distance(X1,Y1,X2,Y2){
 }
 
 //Event handlers
-
+document.addEventListener("click", mouseClickHandler, false);
 document.addEventListener("mousedown", mouseDownHandler, false);
 document.addEventListener("mouseup", mouseUpHandler, false);
+
+function mouseClickHandler(e){
+	console.log("You clicked?")
+	if (!running){
+		document.location.reload();
+	}
+}
 
 function mouseDownHandler(e) {
 	var relativeX = e.clientX - canvas.offsetLeft;
@@ -380,8 +435,7 @@ recognition.onresult = function(event) {
   console.log('Confidence: ' + event.results[0][0].confidence);
   if(answer==word || altanswer==word){
   	//To do, implement victory message
-  		alert("Felicitaciones, campeón! Esa es la palbra correcta");
-  		document.location.reload();
+  		victory();
 
   	}else{
   		alert("Lo siento esa no es la palabra correcta")
@@ -400,4 +454,4 @@ recognition.onerror = function(event) {
 
 
 // main call that keeps the game refreshing
-setInterval(refresh,10)
+setInterval(refresh,10);
