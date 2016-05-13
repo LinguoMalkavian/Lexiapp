@@ -25,6 +25,7 @@ var timer = 0;
 var fulltime=500;
 var animationtype=setAnimationType();
 var wordspeed=2;
+var running=true;
 
 //Other useful global variables
 var buttonPressed=false ;
@@ -145,18 +146,22 @@ if (animationtype=="streaks"){
 
 //Refresher
 function refresh(){
+	
 	ctx.clearRect(0,0,canvas.width,canvas.height)
 	updatePositions();
 	drawBackground();
 	drawButton();
 	drawElements();
 	drawChrono();
-	timer++;
-	if (timer==fulltime){
-		alert("Lo siento, se acabó el tiempo")
-		document.location.reload();
-
+	if(running){
+		timer++;
+		if (timer==fulltime){
+			alert("Lo siento, se acabó el tiempo")
+			running=false
+			defeat();
+		}
 	}
+
 	//drawFullText();
 }
 
@@ -300,6 +305,11 @@ function drawChrono(){
 	ctx.closePath();
 }
 
+//Draws the defeat sequence and then restarts
+function defeat(){
+	alert("Lo siento se acabó el tiempo")
+}
+
 //Utilities
 
 //TODO loads the available words and randomly selects one
@@ -327,6 +337,8 @@ function distance(X1,Y1,X2,Y2){
 	return dist;
 }
 
+//Event handlers
+
 document.addEventListener("mousedown", mouseDownHandler, false);
 document.addEventListener("mouseup", mouseUpHandler, false);
 
@@ -335,6 +347,7 @@ function mouseDownHandler(e) {
     var relativeY = e.clientY-canvas.offsetTop;
     if (distance(relativeX,relativeY,buttonCenterX,buttonCenterY)<=(buttonRadius+5)){
     	buttonPressed=true
+    	running=false;
     	recognition.start();
   		console.log('Ready to receive a word.');
     }
@@ -345,6 +358,7 @@ function mouseUpHandler(e) {
     var relativeY = e.clientY - canvas.offsetUp;
     recognition.stop()
     buttonPressed=false
+    running=true;
 }
 
 recognition.onresult = function(event) {
@@ -356,17 +370,23 @@ recognition.onresult = function(event) {
   // These also have getters so they can be accessed like arrays.
   // The second [0] returns the SpeechRecognitionAlternative at position 0.
   // We then return the transcript property of the SpeechRecognitionAlternative object 
-  console.log("It did stop")
+  console.log("It did stop");
   var answer = event.results[0][0].transcript;
-  var altanswer=event.results[1][0].transcript;
+  var altanswer="";
+  if (event.results.len>1){
+  	 altanswer=event.results[1][0].transcript;
+  }
   console.log( 'Result received: ' + answer + '.');
   console.log('Confidence: ' + event.results[0][0].confidence);
   if(answer==word || altanswer==word){
   	//To do, implement victory message
-  		alert("Congratulations, you got it right!");
+  		alert("Felicitaciones, campeón! Esa es la palbra correcta");
   		document.location.reload();
+
   	}else{
-  		alert("Sorry, that's not the word.")
+  		alert("Lo siento esa no es la palabra correcta")
+  		running=true
+  		tim
   		document.location.reload();
   	}
   }
