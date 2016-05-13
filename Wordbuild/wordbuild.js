@@ -2,6 +2,7 @@
 //LexiGray: rgb(119,104,102)
 //LexiPink: rgb(209,143,133)
 //LexiDarkGrey: rgb(76,61,63)
+var chronoCol="rgb(218,72,7)"
 var bgroundCol="rgb(22,107,84)"//"#339966";
 var bgroundRivet="#ffb500"; //e6e64d
 //TODO determine colors
@@ -20,7 +21,8 @@ var buttonRadius=40;
 
 //Determine game variables
 var word = getWord();
-var time = 300;
+var timer = 0;
+var fulltime=500;
 var animationtype=setAnimationType();
 var wordspeed=2;
 
@@ -29,21 +31,21 @@ var buttonPressed=false ;
 
 //Initialize and set the Speech recognizer
 //imports
-// var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-// var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-// var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
 // //instancing and settings
 
-// var grammar = '#JSGF V1.0; grammar simple; public <word> = mamá | carro | caro | corra | kilo | caer;'
-// var recognition = new SpeechRecognition();
-// var speechRecognitionList = new SpeechGrammarList();
-// speechRecognitionList.addFromString(grammar, 1);
-// recognition.grammars = speechRecognitionList;
-// //recognition.continuous = false;
-// recognition.lang = 'es-CO';
-// recognition.interimResults = false;
-// recognition.maxAlternatives = 5;
+var grammar = "#JSGF V1.0; grammar simple; public <word> =la | va | ve | mi | hoy | doy | soy | pie | rey | bus | sal | luz | sed | miel | piel | fiel | pies | tren | flor | cruz | niño | mesa | carro | malo | todo | lápiz | pared | metál | árbol | antes"
+var recognition = new SpeechRecognition();
+var speechRecognitionList = new SpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
+recognition.grammars = speechRecognitionList;
+//recognition.continuous = false;
+recognition.lang = 'es-CO';
+recognition.interimResults = false;
+recognition.maxAlternatives = 5;
 
 //Load files
 var microImage=new Image();
@@ -51,6 +53,9 @@ var microImage=new Image();
 //     ctx.drawImage(microImage, 300, 300);// this is line 14
 // };
 microImage.src='mic.png';
+
+var chronoImage=new Image();
+chronoImage.src='chrono.png';
 
 //Set background
 var canvas = document.getElementById("myCanvas");
@@ -145,8 +150,14 @@ function refresh(){
 	drawBackground();
 	drawButton();
 	drawElements();
-	//drawFullText();
+	drawChrono();
+	timer++;
+	if (timer==fulltime){
+		alert("Lo siento, se acabó el tiempo")
+		document.location.reload();
 
+	}
+	//drawFullText();
 }
 
 //Drawers
@@ -258,11 +269,35 @@ function drawBackground(){
 	ctx.fill();
 	ctx.closePath();
 	ctx.beginPath();
+	ctx.lineWidth=3
 	ctx.rect(10,10, canvas.width-20, canvas.height-20);
 	ctx.strokeStyle=bgroundRivet;
 	ctx.stroke();
 	ctx.closePath();
+}
+
+//Draws the timer
+function drawChrono(){
 	
+	chronoWidth=chronoImage.width/20;
+	chronoHeight=chronoImage.height/20;
+	chronoX=buttonCenterX-(chronoWidth/2)
+	chronoY=25
+	chronoCenterX=chronoX+ chronoWidth/2
+	chronoCenterY=chronoY+ chronoHeight/2 +6
+	ctx.drawImage(chronoImage,chronoX,chronoY,chronoWidth,chronoHeight)
+	//Calculate the position hof the hand
+	theta=((Math.PI*2*timer)/fulltime)-Math.PI/2;
+	r=20
+	handX=chronoCenterX+r*Math.cos(theta);
+	handY=chronoCenterY+r*Math.sin(theta);
+	ctx.beginPath();
+	ctx.lineWidth=2
+	ctx.strokeStyle=chronoCol;
+	ctx.moveTo(chronoCenterX,chronoCenterY);
+	ctx.lineTo(handX,handY);
+	ctx.stroke();
+	ctx.closePath();
 }
 
 //Utilities
@@ -270,7 +305,7 @@ function drawBackground(){
 //TODO loads the available words and randomly selects one
 function getWord(){
 	//TODO this function is supposed to load the words file and get a random one
-	wordlist=['la ','va ','ve ','mi ','hoy ','doy ','soy ','pie ','rey ','bus ','sal ','luz ','sed ','miel ','piel ','fiel ','pies ','tren ','flor ','cruz ','niño ','mesa ','carro ','malo ','todo ','lápiz ','pared ','metál ','árbol ','antes '];
+	wordlist=['la','va','ve','mi','hoy','doy','soy','pie','rey','bus','sal','luz','sed','miel','piel','fiel','pies','tren','flor','cruz','niño','mesa','carro','malo','todo','lápiz','pared','metál','árbol','antes']	
 	opt=wordlist.length;
 	choice=Math.floor(Math.random()*opt);
 	return wordlist[choice];
@@ -300,7 +335,7 @@ function mouseDownHandler(e) {
     var relativeY = e.clientY-canvas.offsetTop;
     if (distance(relativeX,relativeY,buttonCenterX,buttonCenterY)<=(buttonRadius+5)){
     	buttonPressed=true
-    	// recognition.start();
+    	recognition.start();
   		console.log('Ready to receive a word.');
     }
 
@@ -308,38 +343,41 @@ function mouseDownHandler(e) {
 function mouseUpHandler(e) {
 	var relativeX = e.clientX - canvas.offsetLeft;
     var relativeY = e.clientY - canvas.offsetUp;
-    // recognition.stop()
+    recognition.stop()
     buttonPressed=false
 }
 
-// recognition.onresult = function(event) {
-//   // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
-//   // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
-//   // It has a getter so it can be accessed like an array
-//   // The first [0] returns the SpeechRecognitionResult at position 0.
-//   // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
-//   // These also have getters so they can be accessed like arrays.
-//   // The second [0] returns the SpeechRecognitionAlternative at position 0.
-//   // We then return the transcript property of the SpeechRecognitionAlternative object 
-//   console.log("It did stop")
-//   var answer = event.results[0][0].transcript;
-//   diagnostic.textContent = 'Result received: ' + answer + '.';
-//   console.log('Confidence: ' + event.results[0][0].confidence);
-//   if(result==word){
-//   	//To do, implement victory message
-//   		alert("Yes that's it champion");
-//   	}else{
-//   		alert("Sorry, that's not the word, are you dyslexic or something?")
-//   	}
-//   }
+recognition.onresult = function(event) {
+  // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
+  // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
+  // It has a getter so it can be accessed like an array
+  // The first [0] returns the SpeechRecognitionResult at position 0.
+  // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
+  // These also have getters so they can be accessed like arrays.
+  // The second [0] returns the SpeechRecognitionAlternative at position 0.
+  // We then return the transcript property of the SpeechRecognitionAlternative object 
+  console.log("It did stop")
+  var answer = event.results[0][0].transcript;
+  var altanswer=event.results[1][0].transcript;
+  console.log( 'Result received: ' + answer + '.');
+  console.log('Confidence: ' + event.results[0][0].confidence);
+  if(answer==word || altanswer==word){
+  	//To do, implement victory message
+  		alert("Congratulations, you got it right!");
+  		document.location.reload();
+  	}else{
+  		alert("Sorry, that's not the word.")
+  		document.location.reload();
+  	}
+  }
 
-// recognition.onnomatch = function(event) {
-//   console.log("Nope, not in grammar");
-// }
+recognition.onnomatch = function(event) {
+  console.log("Nope, not in grammar");
+}
 
-// recognition.onerror = function(event) {
-//   console.log( 'Error occurred in recognition: ' + event.error);
-// }
+recognition.onerror = function(event) {
+  console.log( 'Error occurred in recognition: ' + event.error);
+}
 
 
 // main call that keeps the game refreshing
