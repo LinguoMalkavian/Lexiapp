@@ -60,8 +60,8 @@ var lexiLeft=new Image();
 lexiLeft.src='lexiLeft.png'
 var lexiRight=new Image();
 lexiRight.src='lexiRight.png'
-var lexiWait= new Image();
-lexiWait.src= 'LexiWait.png'
+var lexiSad= new Image();
+lexiWait.src= 'sadLexi.png'
 
 //Lexidance
 var finalAnim=false;
@@ -167,8 +167,8 @@ function refresh(){
 	drawChrono();
 	if(running){
 		timer++;
-		if (timer==fulltime){
-			defeat();
+		if (timer>=fulltime){
+			defeatFunc();
 			}
 	}else if (victory){
 		victoryAnimation();
@@ -320,14 +320,13 @@ function drawChrono(){
 }
 
 //Draws the defeat sequence and then restarts
-function defeat(){
+function defeatFunc(){
 	running=false
 }
 
-function victory(){
+function victoryFunc(){
 	running=false;
 	victory=true;
-
 }
 
 function victoryAnimation(){
@@ -335,7 +334,13 @@ function victoryAnimation(){
 	lexiHeight=lexiLeft.height/10
 	lexiPosX=(canvas.width/2)-(lexiWidth/2)
 	lexiPosY=(canvas.height/2)-(lexiHeight/2)
-
+	ctx.beginPath();
+	ctx.fillStyle = "White";
+	ctx.globalAlpha = 0.5;
+	ctx.rect(0, 0, canvas.width, canvas.height);
+	ctx.fill();
+	ctx.closePath();
+	ctx.globalAlpha= 0;
 	if (frameCount%dancingrate==0){
 		lexiSide=-lexiSide;
 	}
@@ -349,12 +354,18 @@ function victoryAnimation(){
 }
 
 function defeatAnimation(){
-	lexiWaitWidth=lexiWait.width/10
-	lexiWaitHeight=lexiWait.height/10
-	lexiWaitPosX=(canvas.width/2)-(lexiWaitWidth/2)
-	lexiWaitPosY=(canvas.height/2)-(lexiWaitHeight/2)
-
-	ctx.drawImage(lexiWait,lexiWaitPosX,lexiWaitPosY,lexiWaitWidth,lexiWaitHeight);
+	sadLexiWidth=sadLexi.width/10
+	sadLexiHeight=sadLexi.height/10
+	sadLexiPosX=(canvas.width/2)-(sadLexiWidth/2)
+	sadLexiPosY=(canvas.height/2)-(sadLexiHeight/2)
+	ctx.beginPath();
+	ctx.fillStyle = "White";
+	ctx.globalAlpha = 0.5;
+	ctx.rect(0, 0, canvas.width, canvas.height);
+	ctx.fill();
+	ctx.closePath();
+	ctx.globalAlpha= 0;
+	ctx.drawImage(sadLexi,sadLexiPosX,sadLexiPosY,sadLexiWidth,sadLexiHeight);
 	
 
 }
@@ -435,7 +446,7 @@ recognition.onresult = function(event) {
   console.log('Confidence: ' + event.results[0][0].confidence);
   if(answer==word || altanswer==word){
   	//To do, implement victory message
-  		victory();
+  		victoryFunc();
 
   	}else{
   		alert("Lo siento esa no es la palabra correcta")
