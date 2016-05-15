@@ -60,8 +60,8 @@ var lexiLeft=new Image();
 lexiLeft.src='lexiLeft.png'
 var lexiRight=new Image();
 lexiRight.src='lexiRight.png'
-var lexiSad= new Image();
-lexiWait.src= 'sadLexi.png'
+var sadLexi= new Image();
+sadLexi.src= 'sadLexi.png'
 
 //Lexidance
 var finalAnim=false;
@@ -321,7 +321,8 @@ function drawChrono(){
 
 //Draws the defeat sequence and then restarts
 function defeatFunc(){
-	running=false
+	running=false;
+	victory=false;
 }
 
 function victoryFunc(){
@@ -340,7 +341,7 @@ function victoryAnimation(){
 	ctx.rect(0, 0, canvas.width, canvas.height);
 	ctx.fill();
 	ctx.closePath();
-	ctx.globalAlpha= 0;
+	ctx.globalAlpha= 1;
 	if (frameCount%dancingrate==0){
 		lexiSide=-lexiSide;
 	}
@@ -364,7 +365,7 @@ function defeatAnimation(){
 	ctx.rect(0, 0, canvas.width, canvas.height);
 	ctx.fill();
 	ctx.closePath();
-	ctx.globalAlpha= 0;
+	ctx.globalAlpha= 1;
 	ctx.drawImage(sadLexi,sadLexiPosX,sadLexiPosY,sadLexiWidth,sadLexiHeight);
 	
 
