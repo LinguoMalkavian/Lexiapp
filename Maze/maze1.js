@@ -235,34 +235,34 @@ function reset_all() {
 	shuffle(words);
 	switch(words[0]) {
 		case "soy":
-			snd = new Audio("soy.ogg");
+			snd = new Audio("soy.wav");
 			break;
 		case "pies":
-			snd = new Audio("pies.ogg");
+			snd = new Audio("pies.wav");
 			break;
 		case "tren":
-			snd = new Audio("tren.ogg");
+			snd = new Audio("tren.wav");
 			break;
 		case "flor":
-			snd = new Audio("flor.ogg");
+			snd = new Audio("flor.wav");
 			break;
 		case "cruz":
-			snd = new Audio("cruz.ogg");
+			snd = new Audio("cruz.wav");
 			break;
 		case "mesa":
-			snd = new Audio("mesa.ogg");
+			snd = new Audio("mesa.wav");
 			break;
 		case "carro":
-			snd = new Audio("carro.ogg");
+			snd = new Audio("carro.wav");
 			break;
 		case "todo":
-			snd = new Audio("todo.ogg");
+			snd = new Audio("todo.wav");
 			break;
 		case "pared":
-			snd = new Audio("pared.ogg");
+			snd = new Audio("pared.wav");
 			break;
 		case "antes":
-			snd = new Audio("antes.ogg");
+			snd = new Audio("antes.wav");
 			break;
 	}
 	ctx.drawImage(lexi_right, lexi_x, lexi_y, 47, 27)
