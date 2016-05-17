@@ -39,7 +39,7 @@ var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEv
 
 // //instancing and settings
 
-var grammar = "#JSGF V1.0; grammar simple; public <word> =la | va | ve | mi | hoy | doy | soy | pie | rey | bus | sal | luz | sed | miel | piel | fiel | pies | tren | flor | cruz | niño | mesa | carro | malo | todo | lápiz | pared | metál | árbol | antes"
+var grammar = "#JSGF V1.0; grammar simple; public <word> =la | va | ve | me | hoy | doy | soy | pie | rey | bus | sal | luz | sed | miel | piel | fiel | pies | tren | flor | cruz | niño | mesa | carro | malo | todo | lápiz | pared | metál | árbol | antes"
 var recognition = new SpeechRecognition();
 recognition.lang = 'es-CO';
 var speechRecognitionList = new SpeechGrammarList();
@@ -376,7 +376,7 @@ function defeatAnimation(){
 //TODO loads the available words and randomly selects one
 function getWord(){
 	//TODO this function is supposed to load the words file and get a random one
-	wordlist=['la','va','ve','mi','hoy','doy','soy','pie','rey','bus','sal','luz','sed','miel','piel','fiel','pies','tren','flor','cruz','niño','mesa','carro','malo','todo','lápiz','pared','metál','árbol','antes']	
+	wordlist=['la','va','ve','me','hoy','doy','soy','pie','rey','bus','sal','luz','sed','miel','piel','fiel','pies','tren','flor','cruz','niño','mesa','carro','malo','todo','lápiz','pared','metál','árbol','antes']	
 	opt=wordlist.length;
 	choice=Math.floor(Math.random()*opt);
 	return wordlist[choice];
@@ -423,7 +423,6 @@ function mouseDownHandler(e) {
 function mouseUpHandler(e) {
 	var relativeX = e.clientX - canvas.offsetLeft;
     var relativeY = e.clientY - canvas.offsetUp;
-    recognition.stop()
     buttonPressed=false
     
 }
@@ -440,17 +439,17 @@ recognition.onresult = function(event) {
   console.log("It did stop");
   var answer = event.results[0][0].transcript;
   var altanswer="";
-  if (event.results.len>1){
-  	 altanswer=event.results[1][0].transcript;
-  }
+  // event.results.forEach(
+		// 	function(elem){
+		// 		console.log(elem[0].transcript+ elem[0].confidence);
+		// });
   console.log( 'Result received: ' + answer + '.');
   console.log('Confidence: ' + event.results[0][0].confidence);
-  if(answer==word || altanswer==word){
+  if(answer.toLowerCase()==word ){
   	//To do, implement victory message
   		victoryFunc();
 
   	}else{
-  		alert("Lo siento esa no es la palabra correcta")
   		//running=true
   		timer+=50
   	}
