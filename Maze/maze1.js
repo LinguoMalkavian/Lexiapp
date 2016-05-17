@@ -199,6 +199,33 @@ function reset_all() {
 	lexi_y = canvas.height-40;
 
 	timer = 0;
+
+	maze_mode = Math.floor(Math.random() * 4);
+
+	switch(maze_mode) {
+		case 0:
+			b1.change(0, 150, 150, 100);
+			b2.change(250, 300, 100, 100);
+			b3.change(200, 150, 100, 50);
+			b4.change(250, 0, 50, 50);
+			b5.change(420, 100, 50, 200);
+			break;
+		case 1:
+			b1.change(0, 150, 150, 50);
+			b2.change(250, 300, 50, 100);
+			b3.change(200, 200, 100, 50);
+			b4.change(250, 0, 25, 50);
+			b5.change(420, 150, 100, 50);
+			break;
+		case 2:
+			b1.change(0, 200, 150, 50);
+			b2.change(250, 200, 50, 200);
+			b3.change(250, 200, 100, 50);
+			b4.change(300, 0, 25, 50);
+			b5.change(420, 150, 100, 50);
+			break;
+	}
+
 	move = false;
 	direction = 0;
 	prev_dir = 0;
@@ -350,6 +377,13 @@ function Block (x, y, w, h) {
 		}
 	};
 
+	this.change = function(x, y, w, h) {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+	}
+
 	this.draw = function() {
 		ctx.fillStyle = "FireBrick";
 		this.colDetect();
@@ -383,15 +417,36 @@ function drawChrono() {
 	ctx.closePath();
 }
 
-maze_mode = Math.floor(Math.random() * 4);
-maze_mode = 0;
+var maze_mode = Math.floor(Math.random() * 4);
+
+var b1 = new Block(0, 150, 150, 100);
+var b2 = new Block(250, 300, 100, 100);
+var b3 = new Block(200, 150, 100, 50);
+var b4 = new Block(250, 0, 50, 50);
+var b5 = new Block(420, 100, 50, 200);
+
 switch(maze_mode) {
 	case 0:
-		var b1 = new Block(0, 150, 150, 100);
-		var b2 = new Block(250, 300, 100, 100);
-		var b3 = new Block(200, 150, 100, 50);
-		var b4 = new Block(250, 0, 50, 50);
-		var b5 = new Block(420, 100, 50, 200);
+		b1.change(0, 150, 150, 100);
+		b2.change(250, 300, 100, 100);
+		b3.change(200, 150, 100, 50);
+		b4.change(250, 0, 50, 50);
+		b5.change(420, 100, 50, 200);
+		break;
+	case 1:
+		b1.change(0, 150, 150, 50);
+		b2.change(250, 300, 50, 100);
+		b3.change(200, 200, 100, 50);
+		b4.change(250, 0, 25, 50);
+		b5.change(420, 150, 100, 50);
+		break;
+	case 2:
+		b1.change(0, 200, 150, 50);
+		b2.change(250, 200, 50, 200);
+		b3.change(250, 200, 100, 50);
+		b4.change(300, 0, 25, 50);
+		b5.change(420, 150, 100, 50);
+		break;
 }
 
 function draw_boarders() {
@@ -412,7 +467,7 @@ function draw_boarders() {
     ctx.rect(0, canvas.height-boarder_w, canvas.width, boarder_w);
     ctx.fill();
     ctx.closePath();
-    ctx.fillStyle = "Black";
+    ctx.fillStyle = "#87CEFA";
     ctx.beginPath();
     ctx.rect(canvas.width-margin_w, 0, margin_w, canvas.height);
     ctx.fill();
